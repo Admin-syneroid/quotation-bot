@@ -1,0 +1,39 @@
+name: Syneroid Quotations
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes (see README: public repo = free; private repo = change to "0 * * * *" hourly)
+  workflow_dispatch: {}        # lets you click "Run workflow" to process immediately / test
+
+concurrency:
+  group: quotations
+  cancel-in-progress: false    # never run two copies at once (avoids double-sending)
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache dependencies + Chromium
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            ~/.cache/puppeteer
+          key: ${{ runner.os }}-quotebot-${{ hashFiles('package.json') }}
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Process new quotations
+        run: node index.js
+        env:
+          CLICKUP_TOKEN: ${{ secrets.CLICKUP_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          CLICKUP_LIST_ID: "901327717511"
+          SLACK_CHANNEL_ID: "C0BEDJ1NT41"

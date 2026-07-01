@@ -1,0 +1,17 @@
+{
+  "name": "syneroid-quotation-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous quotation PDF bot: ClickUp (Quinn's JSON) -> branded PDF -> Slack. Runs on GitHub Actions.",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@slack/web-api": "^7.8.0",
+    "puppeteer": "^23.11.1"
+  }
+}
