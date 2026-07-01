@@ -3,9 +3,18 @@
 // renders the branded quotation PDF (headless Chrome via Puppeteer), posts it to Slack, then marks the task done.
 // Runs autonomously on GitHub Actions (see .github/workflows/quotations.yml). No human, no cost.
 
+import fs from "node:fs";
 import { WebClient } from "@slack/web-api";
 import puppeteer from "puppeteer";
 import { buildHtml } from "./template.js";
+
+// Embed the real GPC Smart logo as a data URI so the render is self-contained (no external asset fetch).
+let LOGO = "";
+try {
+  LOGO = "data:image/png;base64," + fs.readFileSync(new URL("./logo-gpc-smart.png", import.meta.url)).toString("base64");
+} catch {
+  console.warn("logo-gpc-smart.png not found next to index.js — falling back to text wordmark.");
+}
 
 const CLICKUP_TOKEN = process.env.CLICKUP_TOKEN;
 const LIST_ID = process.env.CLICKUP_LIST_ID || "901327717511";
@@ -83,7 +92,7 @@ async function main() {
       const company = data?.client?.company_name || "the client";
 
       if (!browser) browser = await puppeteer.launch({ headless: "new", args: ["--no-sandbox", "--disable-gpu"] });
-      const pdf = await renderPdf(browser, buildHtml(data));
+      const pdf = await renderPdf(browser, buildHtml(data, LOGO));
 
       await slack.files.uploadV2({
         channel_id: SLACK_CHANNEL_ID,
