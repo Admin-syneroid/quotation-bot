@@ -2,7 +2,7 @@ name: Syneroid Quotations
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes (see README: public repo = free; private repo = change to "0 * * * *" hourly)
+    - cron: "0 * * * *"      # hourly — safe inside a PRIVATE repo's free 2,000 min/month. Public repo? use "*/10 * * * *" (every 10 min, unlimited free).
   workflow_dispatch: {}        # lets you click "Run workflow" to process immediately / test
 
 concurrency:
